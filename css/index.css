@@ -1,0 +1,126 @@
+@charset "utf-8";
+
+body {
+	background:url(../img/header_bg.png) repeat-x;
+}
+#header {
+	width:900px;
+	height:30px;
+	margin:0 auto;
+}
+#header .logo {
+	width:100px;
+	height:30px;
+	float:left;
+}
+#header .member {
+	width:80px;
+	height:30px;
+	line-height:30px;
+	text-align:center;
+	cursor:pointer;
+	float:right;
+}
+#header .member span {
+	letter-spacing:1px;
+}
+#header .member img {
+	vertical-align:1px;
+	padding-left:2px;
+}
+#header .member ul {
+	display:none;
+	width:100%;
+	border:1px solid #aaa;
+	border-top:none;
+}
+#header .member li {
+	height:30px;
+	line-height:30px;
+}
+#header .member li a {
+	display:block;
+	background:#fbf7e1 url(../img/arrow3.gif) no-repeat 7px center;
+	letter-spacing:1px;
+	padding-left:10px;
+}
+#header .member li a:hover {
+	background:#fc0 url(../img/arrow4.gif) no-repeat 7px center;
+}
+#header .login_menu {
+	height:30px;
+	line-height:30px;
+	letter-spacing:1px;
+	padding-right:15px;
+	cursor:pointer;
+	float:right;
+}
+
+#screen {
+	display:none;
+	width:100%;
+	position:absolute;
+	top:0;
+	left:0;
+	background-color:#000;
+	opacity:0.3;
+	filter:alpha(opacity=30);
+	z-index:1000;
+}
+
+#login {
+	display:none;
+	width:350px;
+	height:250px;
+	background-color:#fff;
+	border:1px solid #aaa;
+	text-align:center;
+	z-index:1001;
+}
+#login h2 {
+	height:40px;
+	line-height:40px;
+	border-bottom:1px solid #aaa;
+	background:url(../img/login_header.png) repeat-x;
+	letter-spacing:2px;
+	font-size:16px;
+	color:#555;
+	cursor:move;
+}
+#login .close {
+	margin-top:-27px;
+	margin-right:10px;
+	cursor:pointer;
+	float:right;
+}
+#login div {
+	font-size:14px;
+	margin-bottom:15px;
+}
+#login .user {
+	margin-top:29px;
+}
+#login .info {
+	text-align:right;
+	font-size:12px;
+	padding-top:7px;
+	margin-right:10px;
+}
+#login input[type=text],
+#login input[type=password] {
+	width:200px;
+	height:28px;
+	line-height:28px;
+	border:1px solid #aaa;
+	font-size:14px;
+	margin-left:10px;
+	padding:0 5px;
+}
+#login input[type=submit] {
+	width:107px;
+	height:30px;
+	border:none;
+	background:url(../img/login_button.png) no-repeat left;
+	vertical-align:top;
+	cursor:pointer;
+}

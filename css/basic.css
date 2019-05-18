@@ -1,0 +1,32 @@
+@charset "utf-8";
+
+body,h1,h2,h3,h4,h5,h6,p,blockquote,pre,figure,
+hr,dl,dd,input[type=radio],input[type=checkbox] {
+	margin:0;
+}
+th,td,legend,textarea,button,input[type=text],
+input[type=password],input[type=submit],
+input[type=reset],input[type=button] {
+	padding:0;
+}
+fieldset,ol,ul {
+	margin:0;
+	padding:0;
+}
+body,input,button,select,textarea {
+	font-size:12px;
+	color:#333;
+}
+table {
+	border-spacing:1px;
+}
+img {
+	vertical-align:top;
+}
+li {
+	list-style-type:none;
+}
+a {
+	text-decoration:none;
+	color:#333;
+}
