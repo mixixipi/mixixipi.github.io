@@ -17,7 +17,7 @@ body {
 	width:80px;
 	height:30px;
 	line-height:30px;
-	text-align:center;
+	text-indent:10px;
 	cursor:pointer;
 	float:right;
 }
@@ -26,11 +26,10 @@ body {
 }
 #header .member img {
 	vertical-align:1px;
-	padding-left:2px;
+	padding-left:1px;
 }
 #header .member ul {
 	display:none;
-	width:100%;
 	border:1px solid #aaa;
 	border-top:none;
 }
@@ -40,12 +39,12 @@ body {
 }
 #header .member li a {
 	display:block;
-	background:#fbf7e1 url(../img/arrow3.gif) no-repeat 7px center;
+	background:#fbf7e1 url(../img/arrow3.gif) no-repeat 10px center;
 	letter-spacing:1px;
-	padding-left:10px;
+	padding-left:24px;
 }
 #header .member li a:hover {
-	background:#fc0 url(../img/arrow4.gif) no-repeat 7px center;
+	background:#fc0 url(../img/arrow4.gif) no-repeat 10px center;
 }
 #header .login_menu {
 	height:30px;

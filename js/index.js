@@ -1,4 +1,4 @@
-window.onload = function () {
+addEvent(window,'load',function () {
 	var menu = $().byClassName('menu','header');
 	var member = $().byClassName('member','header');
 	member.hover(function () {
@@ -19,4 +19,4 @@ window.onload = function () {
 		screen.unlock();
 		login.hide();
 	});
-};
+});

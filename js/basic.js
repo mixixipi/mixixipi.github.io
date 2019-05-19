@@ -141,15 +141,15 @@
 
 	Base.prototype.hover = function (over,out) {
 		for (var i = 0; i < this.ele.length; i++) {
-			this.ele[i].onmouseover = over;
-			this.ele[i].onmouseout = out;
+			addEvent(this.ele[i],'mouseover',over);
+			addEvent(this.ele[i],'mouseout',out);
 		}
 		return this;
 	};
 
 	Base.prototype.click = function (fn) {
 		for (var i = 0; i < this.ele.length; i++) {
-			this.ele[i].onclick = fn;
+			addEvent(this.ele[i],'click',fn);
 		}
 		return this;
 	};
@@ -188,7 +188,7 @@
 	Base.prototype.resize = function () {
 		for (var i = 0; i < this.ele.length; i++) {
 			var ele = this.ele[i];
-			window.onresize = function () {
+			addEvent(window,'resize',function () {
 				var left = inner().width - ele.offsetWidth;
 				var top = inner().height - ele.offsetHeight;
 				if (ele.offsetLeft > left) {
@@ -197,7 +197,7 @@
 				if (ele.offsetTop > top) {
 					ele.style.top = top + 'px';
 				}
-			};
+			});
 		}
 		return this;
 	};
@@ -216,14 +216,17 @@
 	Base.prototype.drag = function () {
 		for (var i = 0; i < this.ele.length; i++) {
 			var ele = this.ele[i];
-			ele.onmousedown = function (e) {
-				preDef(e);
+			addEvent(ele,'mousedown',function (e) {
 				var mx = e.clientX - ele.offsetLeft;
 				var my = e.clientY - ele.offsetTop;
-				if (typeof ele.setCapture != 'undefined') {
-					ele.setCapture();
+				if (e.target.tagName == 'H2') {
+					addEvent(document,'mousemove',move);
+					addEvent(document,'mouseup',up);
+				} else {
+					removeEvent(document,'mousemove',move);
+					removeEvent(document,'mouseup',up);
 				}
-				document.onmousemove = function (e) {
+				function move(e) {
 					var width = inner().width - ele.offsetWidth;
 					var height = inner().height - ele.offsetHeight;
 					var left = e.clientX - mx;
@@ -242,20 +245,88 @@
 					} else {
 						ele.style.top = top + 'px';
 					}
-				};
-				document.onmouseup = function () {
-					document.onmousemove = null;
-					document.onmouseup = null;
+					if (typeof ele.setCapture != 'undefined') {
+						ele.setCapture();
+					}
+				}
+				function up() {
+					removeEvent(document,'mousemove',move);
+					removeEvent(document,'mouseup',up);
 					if (typeof ele.releaseCapture != 'undefined') {
 						ele.releaseCapture();
 					}
-				};
-			};
+				}
+			});
 		}
 		return this;
 	};
 })(window);
 
+/**************************************************************************/
+
+function addEvent(obj,type,fn) {
+	if (typeof obj.addEventListener != 'undefined') {
+		obj.addEventListener(type,fn,false);
+	} else {
+		if (!obj.events) obj.events = {};
+		if (!obj.events[type]) {
+			obj.events[type] = [];
+		} else {
+			if (addEvent.equal(obj.events[type],fn)) return false;
+		}
+		obj.events[type][addEvent.id++] = fn;
+		obj['on'+type] = addEvent.exec;
+	}
+}
+
+addEvent.id = 0;
+
+addEvent.exec = function () {
+	var e = addEvent.fixEvent(window.event);
+	var es = this.events[e.type];
+	for (var i in es) {
+		es[i].call(this,e);
+	}
+};
+
+addEvent.equal = function (es,fn) {
+	for (var i in es) {
+		if (es[i] == fn) return true;
+	}
+	return false;
+};
+
+addEvent.fixEvent = function (event) {
+	event.preventDefault = addEvent.fixEvent.preventDefault;
+	event.stopPropagation = addEvent.fixEvent.stopPropagation;
+	event.target = event.srcElement;
+	return event;
+};
+
+addEvent.fixEvent.preventDefault = function () {
+	this.returnValue = false;
+};
+
+addEvent.fixEvent.stopPropagation = function () {
+	this.cancelBubble = true;
+};
+
+function removeEvent(obj,type,fn) {
+	if (typeof obj.removeEventListener != 'undefined') {
+		obj.removeEventListener(type,fn,false);
+	} else {
+		if (obj.events) {
+			var es = obj.events[type];
+			for (var i in es) {
+				if (es[i] == fn) {
+					delete es[i];
+				}
+			}
+		}
+	}
+}
+
+/**************************************************************************/
 
 function inner() {
 	if (typeof window.innerWidth != 'undefined') {
@@ -310,4 +381,8 @@ function preDef(e) {
 	} else {
 		e.returnValue = false;
 	}
+}
+
+function trim(str) {
+	return str.replace(/(^\s*)|(\s*$)/g,'');
 }
