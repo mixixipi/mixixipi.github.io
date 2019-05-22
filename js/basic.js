@@ -1,76 +1,126 @@
 (function (window,undefined) {
-	window.$ = function (str) {
-		return new Base(str);
+	var document = window.document;
+
+	window.$ = function (selector) {
+		return new Base(selector);
 	};
 
-	function Base(str) {
+	function Base(selector) {
 		this.ele = [];
-		//var a, b;
-		//a = str.charAt(0);
-		//b = str.substr(1);
+		if (selector != undefined) {
+			if (selector.indexOf(' ') == -1) {
+				switch (selector.charAt(0)) {
+					case '#':
+						this.ele.push(this.idname(selector.substr(1)));
+						break;
+					case '.':
+						this.ele = this.classname(selector.substr(1));
+						break;
+					default:
+						this.ele = this.tagname(selector);
+				}
+			} else {
+				var temp = [];
+				var child = [];
+				var father = [];
+				var arr = selector.split(' ');
+				for (var i = 0; i < arr.length; i++) {
+					if (father.length == 0) {
+						father.push(document);
+					}
+					switch (arr[i].charAt(0)) {
+						case '#':
+							child = [];
+							child.push(this.idname(arr[i].substr(1)));
+							father = child;
+							break;
+						case '.':
+							child = [];
+							for (var j = 0; j < father.length; j++) {
+								temp = this.classname(arr[i].substr(1),father[j]);
+								for (var k = 0; k < temp.length; k++) {
+									child.push(temp[k]);
+								}
+							}
+							father = child;
+							break;
+						default:
+							child = [];
+							for (var j = 0; j < father.length; j++) {
+								temp = this.tagname(arr[i],father[j]);
+								for (var k = 0; k < temp.length; k++) {
+									child.push(temp[k]);
+								}
+							}
+							father = child;
+					}
+				}
+				this.ele = child;
+			}
+		}
 	}
 
-	Base.prototype.find = function (str) {
-		//var a, b;
-		//a = str.charAt(0);
-		//b = str.substr(1);
-		return this;
-	};
-
-	Base.prototype.byId = function (str) {
-		this.ele.push(document.getElementById(str));
-		return this;
-	};
-
-	Base.prototype.byName = function (str,father) {
-		var node = null;
-		if (arguments.length == 2) {
-			node = document.getElementById(father);
-		} else {
-			node = document;
-		}
-		var arr = node.getElementsByName(str);
-		for (var i = 0; i < arr.length; i++) {
-			this.ele.push(arr[i]);
-		}
-		return this;
-	};
-
-	Base.prototype.byTagName = function (str,father) {
-		var node = null;
-		if (arguments.length == 2) {
-			node = document.getElementById(father);
-		} else {
-			node = document;
-		}
-		var arr = node.getElementsByTagName(str);
-		for (var i = 0; i < arr.length; i++) {
-			this.ele.push(arr[i]);
-		}
-		return this;
-	};
-
-	Base.prototype.byClassName = function (str,father) {
-		var node = null;
-		if (arguments.length == 2) {
-			node = document.getElementById(father);
-		} else {
-			node = document;
-		}
-		if (typeof node.getElementsByClassName != 'undefined') {
-			var arr = node.getElementsByClassName(str);
-			for (var i = 0; i < arr.length; i++) {
-				this.ele.push(arr[i]);
-			}
-		} else {
-			var arr = node.getElementsByTagName('*');
-			for (var i = 0; i < arr.length; i++) {
-				if (arr[i].className == str) {
-					this.ele.push(arr[i]);
-				}
+	Base.prototype.find = function (selector) {
+		var child = [];
+		for (var i = 0; i < this.ele.length; i++) {
+			switch (selector.charAt(0)) {
+				case '#':
+					child.push(this.idname(selector.substr(1)));
+					break;
+				case '.':
+					var arr = this.classname(selector.substr(1),this.ele[i]);
+					for (var j = 0; j < arr.length; j++) {
+						child.push(arr[j]);
+					}
+					break;
+				default:
+					var arr = this.tagname(selector,this.ele[i]);
+					for (var j = 0; j < arr.length; j++) {
+						child.push(arr[j]);
+					}
 			}
 		}
+		this.ele = child;
 		return this;
+	};
+
+	Base.prototype.idname = function (selector) {
+		return document.getElementById(selector);
+	};
+
+	Base.prototype.classname = function (selector,father) {
+		var child = [];
+		if (father == undefined) {
+			father = document;
+		}
+		var arr = father.getElementsByClassName(selector);
+		for (var i = 0; i < arr.length; i++) {
+			child.push(arr[i]);
+		}
+		return child;
+	};
+
+	Base.prototype.tagname = function (selector,father) {
+		var child = [];
+		if (father == undefined) {
+			father = document;
+		}
+		var arr = father.getElementsByTagName(selector);
+		for (var i = 0; i < arr.length; i++) {
+			child.push(arr[i]);
+		}
+		return child;
+	};
+
+	Base.prototype.eq = function (num) {
+		var obj = this.ele[num];
+		this.ele = [];
+		this.ele[0] = obj;
+		return this;
+	};
+
+	Base.prototype.element = function (num) {
+		return this.ele[num];
 	};
 
 	Base.prototype.css = function (attr,value) {
@@ -213,13 +263,17 @@
 		return this;
 	};
 
-	Base.prototype.drag = function () {
+	Base.prototype.drag = function (obj) {
 		for (var i = 0; i < this.ele.length; i++) {
 			var ele = this.ele[i];
 			addEvent(ele,'mousedown',function (e) {
 				var mx = e.clientX - ele.offsetLeft;
 				var my = e.clientY - ele.offsetTop;
-				if (e.target.tagName == 'H2') {
+				var flag = false;
+				if (e.target == obj) {
+					flag = true;
+				}
+				if (flag) {
 					addEvent(document,'mousemove',move);
 					addEvent(document,'mouseup',up);
 				} else {
@@ -260,129 +314,8 @@
 		}
 		return this;
 	};
+
+	Base.prototype.extend = function (name,fn) {
+		Base.prototype[name] = fn;
+	};
 })(window);
-
-/**************************************************************************/
-
-function addEvent(obj,type,fn) {
-	if (typeof obj.addEventListener != 'undefined') {
-		obj.addEventListener(type,fn,false);
-	} else {
-		if (!obj.events) obj.events = {};
-		if (!obj.events[type]) {
-			obj.events[type] = [];
-		} else {
-			if (addEvent.equal(obj.events[type],fn)) return false;
-		}
-		obj.events[type][addEvent.id++] = fn;
-		obj['on'+type] = addEvent.exec;
-	}
-}
-
-addEvent.id = 0;
-
-addEvent.exec = function () {
-	var e = addEvent.fixEvent(window.event);
-	var es = this.events[e.type];
-	for (var i in es) {
-		es[i].call(this,e);
-	}
-};
-
-addEvent.equal = function (es,fn) {
-	for (var i in es) {
-		if (es[i] == fn) return true;
-	}
-	return false;
-};
-
-addEvent.fixEvent = function (event) {
-	event.preventDefault = addEvent.fixEvent.preventDefault;
-	event.stopPropagation = addEvent.fixEvent.stopPropagation;
-	event.target = event.srcElement;
-	return event;
-};
-
-addEvent.fixEvent.preventDefault = function () {
-	this.returnValue = false;
-};
-
-addEvent.fixEvent.stopPropagation = function () {
-	this.cancelBubble = true;
-};
-
-function removeEvent(obj,type,fn) {
-	if (typeof obj.removeEventListener != 'undefined') {
-		obj.removeEventListener(type,fn,false);
-	} else {
-		if (obj.events) {
-			var es = obj.events[type];
-			for (var i in es) {
-				if (es[i] == fn) {
-					delete es[i];
-				}
-			}
-		}
-	}
-}
-
-/**************************************************************************/
-
-function inner() {
-	if (typeof window.innerWidth != 'undefined') {
-		return {
-			width : window.innerWidth,
-			height : window.innerHeight
-		};
-	} else {
-		return {
-			width : document.documentElement.clientWidth,
-			height : document.documentElement.clientHeight
-		};
-	}
-}
-
-function getStyle(ele,attr) {
-	if (typeof window.getComputedStyle != 'undefined') {
-		return window.getComputedStyle(ele,null)[attr];
-	} else if (typeof ele.currentStyle != 'undefined') {
-		return ele.currentStyle[attr];
-	}
-}
-
-function hasClass(ele,cname) {
-	var regexp = new RegExp('(\\s|^)' + cname + '(\\s|$)');
-	return ele.className.match(regexp);
-}
-
-function insertRule(sheet,selectorText,cssText,position) {
-	if (typeof sheet.insertRule != 'undefined') {
-		sheet.insertRule(selectorText + '{' + cssText + '}',position);
-	} else if (typeof sheet.addRule != 'undefined') {
-		sheet.addRule(selectorText,cssText,position);
-	}
-}
-
-function deleteRule(sheet,index) {
-	if (typeof sheet.deleteRule != 'undefined') {
-		sheet.deleteRule(index);
-	} else if (typeof sheet.removeRule != 'undefined') {
-		sheet.removeRule(index);
-	}
-}
-
-function getEvent(event) {
-	return event || window.event;
-}
-
-function preDef(e) {
-	if (typeof e.preventDefault != 'undefined') {
-		e.preventDefault();
-	} else {
-		e.returnValue = false;
-	}
-}
-
-function trim(str) {
-	return str.replace(/(^\s*)|(\s*$)/g,'');
-}

@@ -1,22 +1,17 @@
 addEvent(window,'load',function () {
-	var menu = $().byClassName('menu','header');
-	var member = $().byClassName('member','header');
-	member.hover(function () {
-		menu.show();
+	$('.member_menu').hover(function () {
+		$('.member_menu ul').show();
 	},function () {
-		menu.hide();
+		$('.member_menu ul').hide();
 	});
 
-	var login = $().byId('login');
-	var screen = $().byId('screen');
-	var login_close = $().byClassName('close','login');
-	var login_menu = $().byClassName('login_menu','header');
-	login_menu.click(function () {
-		screen.lock();
-		login.show().center(350,350).drag().resize();
+	var move = $('.login_move').element(0);
+	$('.login_menu').click(function () {
+		$('#screen').lock();
+		$('#login').show().center(350,350).resize().drag(move);
 	});
-	login_close.click(function () {
-		screen.unlock();
-		login.hide();
+	$('.login_close').click(function () {
+		$('#screen').unlock();
+		$('#login').hide();
 	});
 });

@@ -13,7 +13,7 @@ body {
 	height:30px;
 	float:left;
 }
-#header .member {
+#header .member_menu {
 	width:80px;
 	height:30px;
 	line-height:30px;
@@ -21,29 +21,29 @@ body {
 	cursor:pointer;
 	float:right;
 }
-#header .member span {
+#header .member_menu span {
 	letter-spacing:1px;
 }
-#header .member img {
+#header .member_menu img {
 	vertical-align:1px;
 	padding-left:1px;
 }
-#header .member ul {
+#header .member_menu ul {
 	display:none;
 	border:1px solid #aaa;
 	border-top:none;
 }
-#header .member li {
+#header .member_menu li {
 	height:30px;
 	line-height:30px;
 }
-#header .member li a {
+#header .member_menu li a {
 	display:block;
 	background:#fbf7e1 url(../img/arrow3.gif) no-repeat 10px center;
 	letter-spacing:1px;
 	padding-left:24px;
 }
-#header .member li a:hover {
+#header .member_menu li a:hover {
 	background:#fc0 url(../img/arrow4.gif) no-repeat 10px center;
 }
 #header .login_menu {
@@ -86,7 +86,7 @@ body {
 	color:#555;
 	cursor:move;
 }
-#login .close {
+#login .login_close {
 	margin-top:-27px;
 	margin-right:10px;
 	cursor:pointer;
@@ -96,10 +96,10 @@ body {
 	font-size:14px;
 	margin-bottom:15px;
 }
-#login .user {
+#login .login_first {
 	margin-top:29px;
 }
-#login .info {
+#login .login_end {
 	text-align:right;
 	font-size:12px;
 	padding-top:7px;
