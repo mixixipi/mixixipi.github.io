@@ -1,5 +1,6 @@
-(function (window,undefined) {
+(function (window) {
 	var document = window.document;
+	var docele = document.documentElement;
 
 	window.$ = function (selector) {
 		return new Base(selector);
@@ -8,57 +9,65 @@
 	function Base(selector) {
 		this.ele = [];
 		if (selector != undefined) {
-			if (selector.indexOf(' ') == -1) {
-				switch (selector.charAt(0)) {
-					case '#':
-						this.ele.push(this.idname(selector.substr(1)));
-						break;
-					case '.':
-						this.ele = this.classname(selector.substr(1));
-						break;
-					default:
-						this.ele = this.tagname(selector);
-				}
-			} else {
-				var temp = [];
-				var child = [];
-				var father = [];
-				var arr = selector.split(' ');
-				for (var i = 0; i < arr.length; i++) {
-					if (father.length == 0) {
-						father.push(document);
-					}
-					switch (arr[i].charAt(0)) {
+			if (typeof selector == 'string') {
+				if (selector.indexOf(' ') == -1) {
+					switch (selector.charAt(0)) {
 						case '#':
-							child = [];
-							child.push(this.idname(arr[i].substr(1)));
-							father = child;
+							this.ele.push(this.idname(selector.substr(1)));
 							break;
 						case '.':
-							child = [];
-							for (var j = 0; j < father.length; j++) {
-								temp = this.classname(arr[i].substr(1),father[j]);
-								for (var k = 0; k < temp.length; k++) {
-									child.push(temp[k]);
-								}
-							}
-							father = child;
+							this.ele = this.classname(selector.substr(1));
 							break;
 						default:
-							child = [];
-							for (var j = 0; j < father.length; j++) {
-								temp = this.tagname(arr[i],father[j]);
-								for (var k = 0; k < temp.length; k++) {
-									child.push(temp[k]);
-								}
-							}
-							father = child;
+							this.ele = this.tagname(selector);
 					}
+				} else {
+					var temp = [];
+					var child = [];
+					var father = [];
+					var arr = selector.split(' ');
+					for (var i = 0; i < arr.length; i++) {
+						if (father.length == 0) {
+							father.push(document);
+						}
+						switch (arr[i].charAt(0)) {
+							case '#':
+								child = [];
+								child.push(this.idname(arr[i].substr(1)));
+								father = child;
+								break;
+							case '.':
+								child = [];
+								for (var j = 0; j < father.length; j++) {
+									temp = this.classname(arr[i].substr(1),father[j]);
+									for (var k = 0; k < temp.length; k++) {
+										child.push(temp[k]);
+									}
+								}
+								father = child;
+								break;
+							default:
+								child = [];
+								for (var j = 0; j < father.length; j++) {
+									temp = this.tagname(arr[i],father[j]);
+									for (var k = 0; k < temp.length; k++) {
+										child.push(temp[k]);
+									}
+								}
+								father = child;
+						}
+					}
+					this.ele = child;
 				}
-				this.ele = child;
+			} else if (typeof selector == 'function') {
+				addDomLoaded(selector);
 			}
 		}
 	}
+
+	Base.prototype.ready = function (fn) {
+		addDomLoaded(fn);
+	};
 
 	Base.prototype.find = function (selector) {
 		var child = [];
@@ -119,7 +128,16 @@
 		return this;
 	};
 
-	Base.prototype.element = function (num) {
+	Base.prototype.ge = function (num) {
+		return this.ele[num];
+	};
+
+	Base.prototype.first = function () {
+		return this.ele[0];
+	};
+
+	Base.prototype.last = function () {
+		var num = this.ele.length - 1;
 		return this.ele[num];
 	};
 
@@ -312,6 +330,54 @@
 				}
 			});
 		}
+		return this;
+	};
+
+	Base.prototype.animate = function (obj) {
+		for (var i = 0; i < this.ele.length; i++) {
+			var ele = this.ele[i];
+
+			var attr = obj.attr != undefined ?
+					   obj.attr == 'x' ? 'left' :
+					   obj.attr == 'y' ? 'top' :
+					   obj.attr == 'w' ? 'width' :
+					   obj.attr == 'h' ? 'height' :
+					   'left' : 'left';
+			var start = obj.start != undefined ? obj.start : parseInt(getStyle(ele,attr));
+			var alter = obj.alter != undefined ? obj.alter : 0;
+			var target = obj.target != undefined ? obj.target : start + alter;
+			var step = obj.step != undefined ? obj.step : 10;
+			var speed = obj.speed != undefined ? obj.speed : 10;
+			var buffer = obj.buffer != undefined ? obj.buffer != 0 ? true : false : false;
+			var time = obj.time != undefined ? obj.time : 30;
+
+			if (start > target) step = -step;
+			ele.style[attr] = start + 'px';
+			clearInterval(ele.interval);
+
+			ele.interval = setInterval(function () {
+				if (buffer) {
+					var temp = (target - parseInt(getStyle(ele,attr))) / speed;
+					step = step > 0 ? Math.ceil(temp) : Math.floor(temp);
+				}
+				if (step == 0) {
+					stop();
+				} else if (step > 0 && Math.abs(parseInt(getStyle(ele,attr)) - target) <= step) {
+					stop();
+				} else if (step < 0 && (parseInt(getStyle(ele,attr)) - target) <= Math.abs(step)) {
+					stop();
+				} else {
+					ele.style[attr] = parseInt(getStyle(ele,attr)) + step + 'px';
+				}
+				document.getElementById('output').innerHTML += parseInt(getStyle(ele,attr)) + ',';
+			},time);
+
+			function stop() {
+				ele.style[attr] = target + 'px';
+				clearInterval(ele.interval);
+			}
+		}
+
 		return this;
 	};
 

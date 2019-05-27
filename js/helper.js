@@ -62,6 +62,30 @@ function removeEvent(obj,type,fn) {
 
 /**************************************************************************/
 
+function addDomLoaded(fn) {
+	var timer = null;
+	var isready = false;
+	function doReady() {
+		if (timer) clearInterval(timer);
+		if (isready) return;
+		isready = true;
+		fn();
+	}
+	if (document.addEventListener != undefined) {
+		addEvent(document,'DOMContentLoaded',function () {
+			fn();
+			removeEvent(document,'DOMContentLoaded',arguments.callee);
+		});
+	} else {
+		timer = setInterval(function () {
+			try {
+				document.documentElement.doScroll('left');
+				doReady();
+			} catch (e) {}
+		},1);
+	}
+}
+
 function inner() {
 	if (typeof window.innerWidth != 'undefined') {
 		return {
